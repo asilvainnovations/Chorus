@@ -1,0 +1,170 @@
+// src/hooks/useChat.ts
+import { useCallback } from 'react';
+import { useChatStore } from '../store/chatStore';
+import { Message, ChatMode } from '../types';
+import { v4 as uuidv4 } from 'date-fns';
+import { streamChatMessage, sendChatMessage, performWebSearch, generateImage } from '../services/api';
+import { searchWeb } from '../services/search';
+
+export const useChat = () => {
+  const {
+    currentConversationId,
+    conversations,
+    selectedModel,
+    currentMode,
+    setLoading,
+    setStreaming,
+    addMessage,
+    updateMessage,
+    createConversation,
+  } = useChatStore();
+
+  const currentConversation = conversations.find((c) => c.id === currentConversationId);
+
+  const sendMessage = useCallback(
+    async (content: string, mode: ChatMode = currentMode) => {
+      if (!content.trim()) return;
+
+      const conversationId = currentConversationId || createConversation();
+      const userMessage: Message = {
+        id: uuidv4(),
+        role: 'user',
+        content,
+        timestamp: new Date(),
+      };
+
+      addMessage(conversationId, userMessage);
+      setLoading(true);
+
+      try {
+        let assistantContent = '';
+        let citations = [];
+        let searchResults = [];
+        let images = [];
+
+        // Handle different modes
+        if (mode === 'search') {
+          searchResults = await searchWeb(content);
+          assistantContent = `Based on my search, here's what I found about "${content}":\n\n${searchResults
+            .map((r, i) => `[${i + 1}] ${r.title}\n${r.snippet}\nSource: ${r.source}`)
+            .join('\n\n')}`;
+        } else if (mode === 'image') {
+          const imageUrl = await generateImage(content);
+          images = [{ id: uuidv4(), url: imageUrl, prompt: content, model: selectedModel }];
+          assistantContent = `I've generated an image based on your prompt: "${content}"`;
+        } else {
+          // Standard chat with optional RAG
+          const messages = [
+            ...(currentConversation?.messages || []).map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+            { role: 'user', content },
+          ];
+
+          // If search mode is enabled, augment with search results
+          if (mode === 'chat') {
+            const searchData = await searchWeb(content);
+            if (searchData.length > 0) {
+              searchResults = searchData;
+              const context = searchData
+                .map((r, i) => `[Source ${i + 1}] ${r.title}: ${r.snippet}`)
+                .join('\n');
+              messages[messages.length - 1].content = 
+                `Context from web search:\n${context}\n\nUser query: ${content}`;
+            }
+          }
+
+          const assistantMessageId = uuidv4();
+          const assistantMessage: Message = {
+            id: assistantMessageId,
+            role: 'assistant',
+            content: '',
+            timestamp: new Date(),
+            model: selectedModel,
+            isStreaming: true,
+            searchResults,
+          };
+
+          addMessage(conversationId, assistantMessage);
+
+          // Stream the response
+          setStreaming(true);
+          await streamChatMessage(
+            {
+              model: selectedModel,
+              messages: messages.slice(-10), // Keep last 10 messages for context
+              temperature: 0.7,
+              max_tokens: 4000,
+            },
+            (chunk) => {
+              assistantContent += chunk;
+              updateMessage(conversationId, assistantMessageId, {
+                content: assistantContent,
+              });
+            },
+            () => {
+              setStreaming(false);
+              updateMessage(conversationId, assistantMessageId, {
+                isStreaming: false,
+                content: assistantContent,
+                citations: searchResults.map((r, i) => ({
+                  id: `cite-${i}`,
+                  title: r.title,
+                  url: r.url,
+                  snippet: r.snippet,
+                  index: i + 1,
+                })),
+              });
+            },
+            (error) => {
+              setStreaming(false);
+              updateMessage(conversationId, assistantMessageId, {
+                isStreaming: false,
+                content: `Error: ${error.message}`,
+              });
+            }
+          );
+          setLoading(false);
+          return;
+        }
+
+        // Non-streaming responses
+        const assistantMessage: Message = {
+          id: uuidv4(),
+          role: 'assistant',
+          content: assistantContent,
+          timestamp: new Date(),
+          model: selectedModel,
+          citations: searchResults.map((r, i) => ({
+            id: `cite-${i}`,
+            title: r.title,
+            url: r.url,
+            snippet: r.snippet,
+            index: i + 1,
+          })),
+          images,
+          searchResults,
+        };
+
+        addMessage(conversationId, assistantMessage);
+      } catch (error) {
+        console.error('Chat error:', error);
+        const errorMessage: Message = {
+          id: uuidv4(),
+          role: 'assistant',
+          content: 'Sorry, I encountered an error processing your request. Please try again.',
+          timestamp: new Date(),
+          model: selectedModel,
+        };
+        addMessage(conversationId, errorMessage);
+      } finally {
+        setLoading(false);
+        setStreaming(false);
+      }
+    },
+    [currentConversationId, conversations, selectedModel, currentMode, createConversation, addMessage, updateMessage, setLoading, setStreaming]
+  );
+
+  return { sendMessage, currentConversation };
+};

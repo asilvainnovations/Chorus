@@ -1,4 +1,5 @@
 // src/types/index.ts
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -55,7 +56,6 @@ export interface AIModel {
   supportsVision: boolean;
   supportsStreaming: boolean;
   category: 'basic' | 'premium' | 'image' | 'music';
-  icon?: string;
 }
 
 export interface ImageModel {
@@ -89,4 +89,12 @@ export interface UserSettings {
   apiKey: string;
   streamingEnabled: boolean;
   soundEnabled: boolean;
+}
+
+// AppContext types
+export interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'info' | 'warning';
+  message: string;
+  duration?: number;
 }

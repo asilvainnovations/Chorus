@@ -1,8 +1,4 @@
 // src/components/Layout/Header.tsx
-// ============================================
-// Application Header with Mode Switcher
-// ============================================
-
 import React, { useState } from 'react';
 import {
   Menu,
@@ -17,7 +13,6 @@ import {
   Link2,
 } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
-import { useTheme } from '../../hooks/useTheme';
 import { ModelSelector } from '../ModelSelector/ModelSelector';
 import { SettingsPanel } from '../Settings/SettingsPanel';
 import { ChatMode } from '../../types';

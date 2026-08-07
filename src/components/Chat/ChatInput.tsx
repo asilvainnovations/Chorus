@@ -74,7 +74,7 @@ export const ChatInput: React.FC = () => {
       case 'url':
         return 'Paste a URL to summarize...';
       default:
-        return 'Message Huli Ka...';
+        return 'Message Chorus...';
     }
   };
 
@@ -144,7 +144,7 @@ export const ChatInput: React.FC = () => {
         </div>
 
         <div className="text-center mt-2 text-xs text-gray-400 dark:text-gray-600">
-          Huli Ka can make mistakes. Consider checking important information. •{' '}
+          Chorus can make mistakes. Consider checking important information. •{' '}
           <span className="hidden sm:inline">Press Enter to send, Shift+Enter for new line</span>
         </div>
       </form>

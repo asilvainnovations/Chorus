@@ -1,6 +1,6 @@
 // package.json
 {
-  "name": "huli-ka",
+  "name": "meshchat-clone",
   "private": true,
   "version": "1.0.0",
   "type": "module",

@@ -1,4 +1,8 @@
 // src/components/Chat/ChatInput.tsx
+// ============================================
+// Chat Input with Voice & File Upload
+// ============================================
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Mic, StopCircle } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';

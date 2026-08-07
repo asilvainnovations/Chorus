@@ -1,14 +1,19 @@
 // src/components/Chat/ChatContainer.tsx
+// ============================================
+// Main Chat Container with Empty State
+// ============================================
+
 import React, { useRef, useEffect } from 'react';
 import { useChatStore } from '../../store/chatStore';
 import { useChat } from '../../hooks/useChat';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { LoadingDots } from '../Common/LoadingDots';
-import { Sparkles, Search, Image, Music, FileText, Link2, ArrowRight } from 'lucide-react';
+import { Sparkles, Search, Image, Music, FileText, Link2, ArrowRight, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ChatMode } from '../../types';
 
-const modeIcons = {
+const modeIcons: Record<ChatMode, React.ReactNode> = {
   chat: <MessageSquare size={32} className="text-blue-500" />,
   search: <Search size={32} className="text-green-500" />,
   image: <Image size={32} className="text-purple-500" />,
@@ -17,9 +22,7 @@ const modeIcons = {
   url: <Link2 size={32} className="text-cyan-500" />,
 };
 
-import { MessageSquare } from 'lucide-react';
-
-const suggestions = {
+const suggestions: Record<ChatMode, string[]> = {
   chat: [
     'Explain quantum computing in simple terms',
     'Write a Python function to sort a list',
@@ -47,6 +50,7 @@ const suggestions = {
 export const ChatContainer: React.FC = () => {
   const { currentConversation, isLoading, isStreaming, currentMode } = useChatStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { sendMessage } = useChat();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -55,8 +59,6 @@ export const ChatContainer: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [currentConversation?.messages, isLoading]);
-
-  const { sendMessage } = useChat();
 
   if (!currentConversation || currentConversation.messages.length === 0) {
     return (

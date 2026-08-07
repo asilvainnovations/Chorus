@@ -1,6 +1,10 @@
 // src/components/Chat/ChatMessage.tsx
+// ============================================
+// Individual Chat Message Component
+// ============================================
+
 import React, { useState } from 'react';
-import { User, Bot, Copy, Check, ExternalLink, Download } from 'lucide-react';
+import { User, Bot, Copy, Check, ExternalLink } from 'lucide-react';
 import { Message } from '../../types';
 import { MarkdownRenderer } from '../Common/MarkdownRenderer';
 import { format } from 'date-fns';
@@ -19,7 +23,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for browsers without clipboard API
       const textarea = document.createElement('textarea');
       textarea.value = message.content;
       document.body.appendChild(textarea);

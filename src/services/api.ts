@@ -1,26 +1,21 @@
 // src/services/api.ts
-import { Message } from '../types';
+// ============================================
+// OpenRouter API Client with Streaming
+// ============================================
+
+import { ChatCompletionRequest } from '../types';
 
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY || '';
 
-const headers = {
+const headers: Record<string, string> = {
   'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
   'Content-Type': 'application/json',
-  'HTTP-Referer': window.location.origin,
+  'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '',
   'X-Title': 'Huli Ka AI',
 };
 
-export interface ChatCompletionRequest {
-  model: string;
-  messages: Array<{ role: string; content: string }>;
-  stream?: boolean;
-  max_tokens?: number;
-  temperature?: number;
-  top_p?: number;
-  presence_penalty?: number;
-  frequency_penalty?: number;
-}
+export { OPENROUTER_BASE_URL, headers };
 
 export const sendChatMessage = async (
   request: ChatCompletionRequest
@@ -53,7 +48,6 @@ export const streamChatMessage = async (
   onComplete: () => void,
   onError: (error: Error) => void
 ): Promise<void> => {
-  // Abort any existing stream
   if (currentAbortController) {
     currentAbortController.abort();
   }
@@ -105,7 +99,7 @@ export const streamChatMessage = async (
     onComplete();
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      onComplete(); // Clean completion on abort
+      onComplete();
       return;
     }
     onError(error instanceof Error ? error : new Error('Stream error occurred'));
@@ -121,7 +115,6 @@ export const abortCurrentStream = (): void => {
   }
 };
 
-// Image Generation via OpenRouter/Replicate
 export const generateImage = async (
   prompt: string,
   model: string = 'openai/dall-e-3',
@@ -148,11 +141,10 @@ export const generateImage = async (
   }
 };
 
-// URL / PDF Text Extraction (using a simple proxy approach)
 export const fetchURLContent = async (url: string): Promise<string> => {
   try {
-    // In production, use a backend proxy to avoid CORS
-    const response = await fetch(`https://r.jina.ai/http://${url.replace(/^https?:\/\//, '')}`);
+    const cleanUrl = url.replace(/^https?:\/\//, '');
+    const response = await fetch(`https://r.jina.ai/http://${cleanUrl}`);
     if (!response.ok) throw new Error('Failed to fetch URL');
     return await response.text();
   } catch (error) {

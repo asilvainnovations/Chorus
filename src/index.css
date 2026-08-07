@@ -81,6 +81,7 @@
     background-color: #dbeafe;
     color: #1e3a8a;
   }
+}
 
 @layer components {
   .prose pre {
@@ -136,12 +137,14 @@
   .prose a:hover {
     text-decoration: underline;
   }
+}
+
 /* ========================================
     ENHANCED PLATFORM BADGES
    ======================================== */
 
 /* Primary Bolt Badge Selectors */
-#bolt-badge, 
+#bolt-badge,
 .bolt-badge,
 [data-bolt-badge],
 [id*="bolt"][id*="badge"],

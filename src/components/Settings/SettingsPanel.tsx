@@ -4,6 +4,7 @@ import { X, Key, Zap, Volume2, VolumeX, Monitor, Sun, Moon } from 'lucide-react'
 import { useChatStore } from '../../store/chatStore';
 import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
+import posthog from '../../posthog';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -76,7 +77,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                   {(['light', 'dark', 'system'] as const).map((t) => (
                     <button
                       key={t}
-                      onClick={() => setTheme(t)}
+                      onClick={() => {
+                        setTheme(t);
+                        posthog.capture('theme_selected', { theme: t });
+                      }}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border transition-all ${
                         theme === t
                           ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
@@ -104,7 +108,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                     <input
                       type="checkbox"
                       checked={settings.streamingEnabled}
-                      onChange={(e) => updateSettings({ streamingEnabled: e.target.checked })}
+                      onChange={(e) => {
+                        updateSettings({ streamingEnabled: e.target.checked });
+                        posthog.capture('preference_updated', {
+                          preference: 'streaming_enabled',
+                          enabled: e.target.checked,
+                        });
+                      }}
                       className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </label>
@@ -116,7 +126,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                     <input
                       type="checkbox"
                       checked={settings.soundEnabled}
-                      onChange={(e) => updateSettings({ soundEnabled: e.target.checked })}
+                      onChange={(e) => {
+                        updateSettings({ soundEnabled: e.target.checked });
+                        posthog.capture('preference_updated', {
+                          preference: 'sound_enabled',
+                          enabled: e.target.checked,
+                        });
+                      }}
                       className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </label>
@@ -130,7 +146,13 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                 </h3>
                 <select
                   value={selectedModel}
-                  onChange={(e) => setModel(e.target.value)}
+                  onChange={(e) => {
+                    setModel(e.target.value);
+                    posthog.capture('model_selected', {
+                      model: e.target.value,
+                      source: 'settings',
+                    });
+                  }}
                   className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <optgroup label="Premium">
@@ -156,6 +178,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                   onClick={() => {
                     if (confirm('Clear all conversations? This cannot be undone.')) {
                       useChatStore.getState().clearAllConversations();
+                      posthog.capture('conversations_cleared');
                     }
                   }}
                   className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl transition-colors"

@@ -5,6 +5,7 @@ import { Message, ChatMode, SearchResult } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { streamChatMessage, sendChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
+import posthog from '../posthog';
 
 export const useChat = () => {
   const {
@@ -26,6 +27,12 @@ export const useChat = () => {
       if (!content.trim()) return;
 
       const conversationId = currentConversationId || createConversation();
+
+      posthog.capture('chat_message_submitted', {
+        mode,
+        model: selectedModel,
+        conversation_existing: Boolean(currentConversationId),
+      });
 
       const userMessage: Message = {
         id: uuidv4(),
@@ -116,7 +123,15 @@ export const useChat = () => {
                 content: assistantContent,
               });
             },
-            () => {
+            (cancelled) => {
+              if (!cancelled) {
+                posthog.capture('assistant_response_completed', {
+                  mode,
+                  model: selectedModel,
+                  response_type: 'streaming',
+                  search_results_count: searchResults.length,
+                });
+              }
               setStreaming(false);
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
@@ -130,6 +145,11 @@ export const useChat = () => {
               });
             },
             (error) => {
+              posthog.capture('assistant_response_failed', {
+                mode,
+                model: selectedModel,
+                response_type: 'streaming',
+              });
               setStreaming(false);
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
@@ -161,8 +181,19 @@ export const useChat = () => {
         };
 
         addMessage(conversationId, assistantMessage);
+        posthog.capture('assistant_response_completed', {
+          mode,
+          model: selectedModel,
+          response_type: mode === 'image' ? 'image' : 'search',
+          search_results_count: searchResults.length,
+          generated_image_count: images.length,
+        });
       } catch (error) {
         console.error('Chat error:', error);
+        posthog.capture('assistant_response_failed', {
+          mode,
+          model: selectedModel,
+        });
         const errorMessage: Message = {
           id: uuidv4(),
           role: 'assistant',
@@ -190,10 +221,14 @@ export const useChat = () => {
   );
 
   const abortStream = useCallback(() => {
+    posthog.capture('assistant_response_cancelled', {
+      mode: currentMode,
+      model: selectedModel,
+    });
     abortCurrentStream();
     setStreaming(false);
     setLoading(false);
-  }, [setStreaming, setLoading]);
+  }, [currentMode, selectedModel, setStreaming, setLoading]);
 
   return { sendMessage, abortStream, currentConversation };
 };

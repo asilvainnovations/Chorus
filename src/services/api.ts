@@ -50,7 +50,7 @@ let currentAbortController: AbortController | null = null;
 export const streamChatMessage = async (
   request: ChatCompletionRequest,
   onChunk: (chunk: string) => void,
-  onComplete: () => void,
+  onComplete: (cancelled: boolean) => void,
   onError: (error: Error) => void
 ): Promise<void> => {
   // Abort any existing stream
@@ -102,10 +102,10 @@ export const streamChatMessage = async (
       }
     }
 
-    onComplete();
+    onComplete(false);
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      onComplete(); // Clean completion on abort
+      onComplete(true); // Clean completion on abort
       return;
     }
     onError(error instanceof Error ? error : new Error('Stream error occurred'));

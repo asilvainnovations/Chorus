@@ -20,6 +20,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { ModelSelector } from '../ModelSelector/ModelSelector';
 import { SettingsPanel } from '../Settings/SettingsPanel';
 import { ChatMode } from '../../types';
+import posthog from '../../posthog';
 
 const modeConfig: Record<ChatMode, { icon: React.ReactNode; label: string; color: string; bg: string }> = {
   chat: {
@@ -94,7 +95,10 @@ export const Header: React.FC = () => {
             {(Object.keys(modeConfig) as ChatMode[]).map((mode) => (
               <button
                 key={mode}
-                onClick={() => setMode(mode)}
+                onClick={() => {
+                  setMode(mode);
+                  posthog.capture('chat_mode_selected', { mode });
+                }}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                   currentMode === mode
                     ? `${modeConfig[mode].bg} ${modeConfig[mode].color} shadow-sm`
@@ -113,7 +117,10 @@ export const Header: React.FC = () => {
           <ModelSelector />
 
           <button
-            onClick={() => createConversation()}
+            onClick={() => {
+              createConversation();
+              posthog.capture('conversation_created', { source: 'header' });
+            }}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             title="New Chat (⌘N)"
           >

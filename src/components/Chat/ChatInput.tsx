@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Paperclip, Mic, StopCircle } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
 import { useChat } from '../../hooks/useChat';
+import posthog from '../../posthog';
 
 export const ChatInput: React.FC = () => {
   const [input, setInput] = useState('');
@@ -46,7 +47,10 @@ export const ChatInput: React.FC = () => {
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    recognition.onstart = () => setIsRecording(true);
+    recognition.onstart = () => {
+      setIsRecording(true);
+      posthog.capture('voice_input_started', { mode: currentMode });
+    };
     recognition.onend = () => setIsRecording(false);
     recognition.onerror = () => setIsRecording(false);
     recognition.onresult = (event: any) => {

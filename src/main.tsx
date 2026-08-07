@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import './posthog';
 
 // Initialize theme before render to prevent flash
 const savedTheme = localStorage.getItem('meshchat-storage');

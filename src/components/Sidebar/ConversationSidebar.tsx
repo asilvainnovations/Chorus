@@ -3,6 +3,7 @@ import React from 'react';
 import { MessageSquare, Trash2, Edit3, X } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
 import { formatDistanceToNow } from 'date-fns';
+import posthog from '../../posthog';
 
 export const ConversationSidebar: React.FC = () => {
   const { conversations, currentConversationId, setCurrentConversation, deleteConversation, renameConversation, createConversation } = useChatStore();
@@ -18,6 +19,7 @@ export const ConversationSidebar: React.FC = () => {
   const saveRename = (id: string) => {
     if (editTitle.trim()) {
       renameConversation(id, editTitle.trim());
+      posthog.capture('conversation_renamed');
     }
     setEditingId(null);
   };
@@ -26,7 +28,10 @@ export const ConversationSidebar: React.FC = () => {
     <div className="h-full w-80 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       <div className="p-3">
         <button
-          onClick={() => createConversation()}
+          onClick={() => {
+            createConversation();
+            posthog.capture('conversation_created', { source: 'sidebar' });
+          }}
           className="w-full flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
         >
           <MessageSquare size={18} />
@@ -65,7 +70,10 @@ export const ConversationSidebar: React.FC = () => {
               </div>
             ) : (
               <button
-                onClick={() => setCurrentConversation(conversation.id)}
+                onClick={() => {
+                  setCurrentConversation(conversation.id);
+                  posthog.capture('conversation_selected');
+                }}
                 className="w-full flex items-start gap-3 px-3 py-2.5 text-left"
               >
                 <MessageSquare size={16} className="mt-0.5 text-gray-400 flex-shrink-0" />
@@ -89,6 +97,7 @@ export const ConversationSidebar: React.FC = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       deleteConversation(conversation.id);
+                      posthog.capture('conversation_deleted');
                     }}
                     className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 rounded"
                   >

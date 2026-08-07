@@ -1,4 +1,8 @@
 // src/components/Layout/AppLayout.tsx
+// ============================================
+// Root Application Layout
+// ============================================
+
 import React, { ReactNode } from 'react';
 import { Header } from './Header';
 import { ConversationSidebar } from '../Sidebar/ConversationSidebar';

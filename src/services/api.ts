@@ -8,7 +8,7 @@ const headers: Record<string, string> = {
   'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
   'Content-Type': 'application/json',
   'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '',
-  'X-Title': 'Huli Ka AI',
+  'X-Title': 'Chorus AI',
 };
 
 export { OPENROUTER_BASE_URL, headers };

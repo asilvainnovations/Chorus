@@ -1,4 +1,4 @@
-# Huli Ka
+# Chorus AI Chat
 
 > A production-ready multi-model AI chat interface with RAG search, image generation, and more.
 

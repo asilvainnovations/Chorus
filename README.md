@@ -1,6 +1,6 @@
 # Chorus
 
-> A production-ready multi-model AI chat interface with RAG search, image generation, and more.
+> A multi-model AI chat interface with RAG search, image generation, and more.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react)
@@ -27,8 +27,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/asilvainnovations/huli-ka.git
-cd huli-ka
+git clone https://github.com/asilvainnovations/chorus.git
+cd chorus
 
 # 2. Install dependencies
 npm install
@@ -120,7 +120,3 @@ Output is in `dist/`. Deploy to Vercel, Netlify, or any static host.
 - **Animation**: Framer Motion
 - **Markdown**: react-markdown + remark-gfm + rehype-highlight
 - **Icons**: Lucide React
-
-## License
-
-MIT © 2026 ASilva Innovations

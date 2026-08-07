@@ -1,13 +1,9 @@
 // src/hooks/useChat.ts
-// ============================================
-// Chat Logic Hook with Streaming
-// ============================================
-
 import { useCallback } from 'react';
 import { useChatStore } from '../store/chatStore';
-import { Message, ChatMode, SearchResult } from '../types';
+import { Message, ChatMode, SearchResult, GeneratedImage } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { streamChatMessage, sendChatMessage, abortCurrentStream, generateImage } from '../services/api';
+import { streamChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
 
 export const useChat = () => {
@@ -43,19 +39,18 @@ export const useChat = () => {
 
       try {
         let assistantContent = '';
-        let citations = [];
         let searchResults: SearchResult[] = [];
-        let images = [];
+        let images: GeneratedImage[] = [];
 
         if (mode === 'search') {
           const searchData = await searchWeb({ query: content, maxResults: 5 });
           searchResults = searchData.results;
           assistantContent = searchData.answer
             ? `${searchData.answer}\n\n**Sources:**\n\n${searchResults
-                .map((r, i) => `[${i + 1}] [${r.title}](${r.url})\n${r.snippet}`)
+                .map((r) => `[${r.title}](${r.url})\n${r.snippet}`)
                 .join('\n\n')}`
             : `Here are the search results for "${content}":\n\n${searchResults
-                .map((r, i) => `[${i + 1}] **${r.title}**\n${r.snippet}\nSource: ${r.source}`)
+                .map((r) => `**${r.title}**\n${r.snippet}\nSource: ${r.source}`)
                 .join('\n\n')}`;
         } else if (mode === 'image') {
           const imageUrls = await generateImage(content, selectedModel);
@@ -80,7 +75,7 @@ export const useChat = () => {
             if (searchData.results.length > 0) {
               searchResults = searchData.results;
               const context = searchData.results
-                .map((r, i) => `[Source ${i + 1}] ${r.title}: ${r.snippet}`)
+                .map((r, idx) => `[Source ${idx + 1}] ${r.title}: ${r.snippet}`)
                 .join('\n');
               finalContent = `Based on the following web search results:\n\n${context}\n\nUser query: ${content}`;
             }
@@ -117,12 +112,12 @@ export const useChat = () => {
               setStreaming(false);
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
-                citations: searchResults.map((r, i) => ({
-                  id: `cite-${i}`,
+                citations: searchResults.map((r, idx) => ({
+                  id: `cite-${idx}`,
                   title: r.title,
                   url: r.url,
                   snippet: r.snippet,
-                  index: i + 1,
+                  index: idx + 1,
                 })),
               });
             },
@@ -145,12 +140,12 @@ export const useChat = () => {
           content: assistantContent,
           timestamp: new Date(),
           model: selectedModel,
-          citations: searchResults.map((r, i) => ({
-            id: `cite-${i}`,
+          citations: searchResults.map((r, idx) => ({
+            id: `cite-${idx}`,
             title: r.title,
             url: r.url,
             snippet: r.snippet,
-            index: i + 1,
+            index: idx + 1,
           })),
           images,
           searchResults,

@@ -4,6 +4,7 @@ import { X, Key, Zap, Volume2, VolumeX, Monitor, Sun, Moon } from 'lucide-react'
 import { useChatStore } from '../../store/chatStore';
 import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getPremiumModels, getBasicModels } from '../../services/models';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -134,15 +135,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                   className="w-full px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <optgroup label="Premium">
-                    <option value="openai/gpt-4o">GPT-4o</option>
-                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-                    <option value="google/gemini-1.5-pro">Gemini 1.5 Pro</option>
-                    <option value="xai/grok-2">Grok 2</option>
+                    {getPremiumModels().map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
                   </optgroup>
                   <optgroup label="Basic">
-                    <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
-                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-                    <option value="google/gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    {getBasicModels().map((model) => (
+                      <option key={model.id} value={model.id}>{model.name}</option>
+                    ))}
                   </optgroup>
                 </select>
               </section>
@@ -167,7 +167,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
               {/* Version */}
               <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
                 <p className="text-xs text-gray-400 text-center">
-                  Huli Ka v{import.meta.env.VITE_APP_VERSION || '1.0.0'}
+                  Chorus v{import.meta.env.VITE_APP_VERSION || '1.0.0'}
                 </p>
               </div>
             </div>

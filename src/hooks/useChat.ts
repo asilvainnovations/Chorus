@@ -1,4 +1,8 @@
 // src/hooks/useChat.ts
+// ============================================
+// Chat Logic Hook with Streaming
+// ============================================
+
 import { useCallback } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { Message, ChatMode, SearchResult } from '../types';
@@ -43,7 +47,6 @@ export const useChat = () => {
         let searchResults: SearchResult[] = [];
         let images = [];
 
-        // Handle different modes
         if (mode === 'search') {
           const searchData = await searchWeb({ query: content, maxResults: 5 });
           searchResults = searchData.results;
@@ -56,7 +59,7 @@ export const useChat = () => {
                 .join('\n\n')}`;
         } else if (mode === 'image') {
           const imageUrls = await generateImage(content, selectedModel);
-          images = imageUrls.map((url, i) => ({
+          images = imageUrls.map((url) => ({
             id: uuidv4(),
             url,
             prompt: content,
@@ -64,7 +67,6 @@ export const useChat = () => {
           }));
           assistantContent = `I've generated ${images.length} image${images.length > 1 ? 's' : ''} based on your prompt: "${content}"`;
         } else {
-          // Standard chat with optional RAG augmentation
           const historyMessages = (currentConversation?.messages || [])
             .slice(-10)
             .map((m) => ({
@@ -72,7 +74,6 @@ export const useChat = () => {
               content: m.content,
             }));
 
-          // If in chat mode, optionally augment with search
           let finalContent = content;
           if (mode === 'chat') {
             const searchData = await searchWeb({ query: content, maxResults: 3 });
@@ -97,16 +98,12 @@ export const useChat = () => {
           };
 
           addMessage(conversationId, assistantMessage);
-
           setStreaming(true);
 
           await streamChatMessage(
             {
               model: selectedModel,
-              messages: [
-                ...historyMessages,
-                { role: 'user', content: finalContent },
-              ],
+              messages: [...historyMessages, { role: 'user', content: finalContent }],
               temperature: 0.7,
               max_tokens: 4000,
             },
@@ -142,7 +139,6 @@ export const useChat = () => {
           return;
         }
 
-        // Non-streaming responses (search, image)
         const assistantMessage: Message = {
           id: uuidv4(),
           role: 'assistant',

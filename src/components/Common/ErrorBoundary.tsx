@@ -1,8 +1,3 @@
-// src/components/Common/ErrorBoundary.tsx
-// ============================================
-// Global Error Boundary with Recovery
-// ============================================
-
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
@@ -60,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <RefreshCw size={16} />
               Reload Application
             </button>
-            {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
+            {import.meta.env.DEV && this.state.errorInfo && (
               <details className="mt-4 text-left">
                 <summary className="text-xs text-gray-500 cursor-pointer">Stack trace</summary>
                 <pre className="mt-2 p-3 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs text-gray-600 dark:text-gray-400 overflow-auto max-h-48">

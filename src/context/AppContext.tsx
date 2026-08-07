@@ -1,21 +1,10 @@
 // src/context/AppContext.tsx
+// ============================================
+// Global Application Context
+// ============================================
+
 import React, { createContext, useContext, useCallback, useState, ReactNode } from 'react';
-import { useChatStore } from '../store/chatStore';
-
-interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-  message: string;
-  duration?: number;
-}
-
-interface AppContextType {
-  toasts: Toast[];
-  addToast: (toast: Omit<Toast, 'id'>) => void;
-  removeToast: (id: string) => void;
-  isOnline: boolean;
-  isElectron: boolean;
-}
+import { Toast, AppContextType } from '../types';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -24,7 +13,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isElectron] = useState(() => typeof window !== 'undefined' && !!(window as any).electron);
 
-  // Network status
   React.useEffect(() => {
     const handleOnline = () => {
       setIsOnline(true);
@@ -46,12 +34,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substring(2, 9);
     const newToast: Toast = { ...toast, id, duration: toast.duration ?? 5000 };
-    
+
     setToasts((prev) => [...prev, newToast]);
 
     if (newToast.duration > 0) {
       setTimeout(() => {
-        removeToast(id);
+        setToasts((prev) => prev.filter((t) => t.id !== id));
       }, newToast.duration);
     }
   }, []);

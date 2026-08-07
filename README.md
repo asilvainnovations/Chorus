@@ -1,4 +1,4 @@
-# Chorus AI Chat
+# Chorus
 
 > A production-ready multi-model AI chat interface with RAG search, image generation, and more.
 

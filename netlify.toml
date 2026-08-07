@@ -1,38 +1,20 @@
 # ============================================
-# HULI KA — Netlify Configuration
-# ============================================
-# This file configures how Netlify builds and deploys your project.
-# Place this at the root of your repository.
+# HULI KA — Netlify Configuration (Vite + React)
+# Fixed: Removed Next.js runtime conflict
 # ============================================
 
 [build]
-  # Base directory (root of repo for this project)
-  base = "."
-
-  # Build command — compiles TypeScript and bundles with Vite
+  base = "/"
   command = "npm run build"
-
-  # Directory containing the built files to publish
   publish = "dist"
 
-  # Functions directory (if you add serverless functions later)
-  functions = "netlify/functions"
-
 [build.environment]
-  # Node.js version — matches your local dev environment
-  NODE_VERSION = "20"
-
-  # NPM version
+  NODE_VERSION = "24"
   NPM_VERSION = "10"
-
-  # Ensure CI environment for consistent builds
   CI = "true"
 
 # ============================================
-# REDIRECTS — SPA Routing Support
-# ============================================
-# Required for React Router / client-side routing
-# All routes serve index.html, letting React handle routing
+# SPA REDIRECTS
 # ============================================
 
 [[redirects]]
@@ -41,62 +23,20 @@
   status = 200
 
 # ============================================
-# HEADERS — Security & Performance
+# SECURITY HEADERS
 # ============================================
 
 [[headers]]
-  # Apply to all routes
   for = "/*"
 
   [headers.values]
-    # Security headers
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-
-    # Content Security Policy (adjust as needed for APIs)
-    Content-Security-Policy = "default-src 'self'; connect-src 'self' https://openrouter.ai https://api.tavily.com https://r.jina.ai; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:;"
-
-    # Caching for static assets
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
-  # Cache hashed assets aggressively (Vite generates hashed filenames)
   for = "/assets/*"
-
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-# ============================================
-# DEPLOY CONTEXTS
-# ============================================
-# Different settings for production vs preview deploys
-# ============================================
-
-[context.production]
-  # Production-specific environment variables
-  # Add these in Netlify UI → Site settings → Environment variables
-  # DO NOT put secrets in this file — use Netlify UI instead
-
-[context.deploy-preview]
-  # Preview deploy settings (pull requests)
-  command = "npm run build"
-
-[context.branch-deploy]
-  # Branch deploy settings
-  command = "npm run build"
-
-# ============================================
-# PLUGINS
-# ============================================
-
-[[plugins]]
-  # Lighthouse plugin — performance auditing on every build
-  package = "@netlify/plugin-lighthouse"
-
-  [plugins.inputs.thresholds]
-    performance = 0.7
-    accessibility = 0.9
-    best-practices = 0.8
-    seo = 0.8

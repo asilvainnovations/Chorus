@@ -1,4 +1,8 @@
 // src/components/Layout/Header.tsx
+// ============================================
+// Application Header with Mode Switcher
+// ============================================
+
 import React, { useState } from 'react';
 import {
   Menu,
@@ -7,9 +11,6 @@ import {
   Search,
   Image,
   MessageSquare,
-  Sun,
-  Moon,
-  Monitor,
   Settings,
   Music,
   FileText,
@@ -62,14 +63,7 @@ const modeConfig: Record<ChatMode, { icon: React.ReactNode; label: string; color
 
 export const Header: React.FC = () => {
   const { toggleSidebar, currentMode, setMode, createConversation, toggleCommandPalette } = useChatStore();
-  const { theme } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-  const themeIcon = {
-    light: <Sun size={18} />,
-    dark: <Moon size={18} />,
-    system: <Monitor size={18} />,
-  };
 
   return (
     <>

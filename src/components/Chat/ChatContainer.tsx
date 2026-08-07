@@ -1,15 +1,11 @@
 // src/components/Chat/ChatContainer.tsx
-// ============================================
-// Main Chat Container with Empty State
-// ============================================
-
 import React, { useRef, useEffect } from 'react';
 import { useChatStore } from '../../store/chatStore';
 import { useChat } from '../../hooks/useChat';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { LoadingDots } from '../Common/LoadingDots';
-import { Sparkles, Search, Image, Music, FileText, Link2, ArrowRight, MessageSquare } from 'lucide-react';
+import { Sparkles, ArrowRight, MessageSquare, Search, Image, Music, FileText, Link2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ChatMode } from '../../types';
 
@@ -48,9 +44,11 @@ const suggestions: Record<ChatMode, string[]> = {
 };
 
 export const ChatContainer: React.FC = () => {
-  const { currentConversation, isLoading, isStreaming, currentMode } = useChatStore();
+  const { conversations, currentConversationId, isLoading, isStreaming, currentMode } = useChatStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { sendMessage } = useChat();
+
+  const currentConversation = conversations.find((c) => c.id === currentConversationId);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -70,7 +68,7 @@ export const ChatContainer: React.FC = () => {
             className="text-center max-w-lg"
           >
             <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Sparkles size={40} className="text-blue-600 dark:text-blue-400" />
+              {modeIcons[currentMode] || <Sparkles size={40} className="text-blue-600 dark:text-blue-400" />}
             </div>
             <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
               What can I help you with?
@@ -105,7 +103,7 @@ export const ChatContainer: React.FC = () => {
     <div className="flex-1 flex flex-col min-w-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-          {currentConversation.messages.map((message, index) => (
+          {currentConversation.messages.map((message: { id: string; role: string; content: string; timestamp: Date; model?: string; citations?: any[]; images?: any[]; isStreaming?: boolean; searchResults?: any[] }, index: number) => (
             <motion.div
               key={message.id}
               initial={{ opacity: 0, y: 10 }}

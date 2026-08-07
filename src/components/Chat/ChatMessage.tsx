@@ -1,8 +1,4 @@
 // src/components/Chat/ChatMessage.tsx
-// ============================================
-// Individual Chat Message Component
-// ============================================
-
 import React, { useState } from 'react';
 import { User, Bot, Copy, Check, ExternalLink } from 'lucide-react';
 import { Message } from '../../types';
@@ -62,7 +58,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
           )}
 
-          {/* Citations */}
           {message.citations && message.citations.length > 0 && (
             <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
@@ -93,7 +88,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
           )}
 
-          {/* Generated Images */}
           {message.images && message.images.length > 0 && (
             <div className="mt-4 grid grid-cols-2 gap-3">
               {message.images.map((img) => (
@@ -119,7 +113,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
           )}
 
-          {/* Streaming indicator */}
           {message.isStreaming && (
             <div className="mt-2 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />

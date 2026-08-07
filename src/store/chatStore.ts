@@ -1,8 +1,4 @@
 // src/store/chatStore.ts
-// ============================================
-// Zustand Store with Persistence
-// ============================================
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Conversation, Message, ChatMode, UserSettings } from '../types';
@@ -19,7 +15,6 @@ interface ChatState {
   sidebarOpen: boolean;
   commandPaletteOpen: boolean;
 
-  // Actions
   createConversation: () => string;
   setCurrentConversation: (id: string) => void;
   addMessage: (conversationId: string, message: Message) => void;

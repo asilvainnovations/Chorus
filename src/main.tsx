@@ -1,11 +1,15 @@
 // src/main.tsx
+// ============================================
+// Application Entry Point
+// ============================================
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
 // Initialize theme before render to prevent flash
-const savedTheme = localStorage.getItem('meshchat-storage');
+const savedTheme = localStorage.getItem('huli-ka-storage');
 if (savedTheme) {
   try {
     const parsed = JSON.parse(savedTheme);

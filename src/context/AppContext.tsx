@@ -1,6 +1,13 @@
-// src/context/AppContext.tsx
 import React, { createContext, useContext, useCallback, useState, ReactNode } from 'react';
-import { Toast, AppContextType } from '../types';
+import { Toast } from '../types';
+
+interface AppContextType {
+  toasts: Toast[];
+  addToast: (toast: Omit<Toast, 'id'>) => void;
+  removeToast: (id: string) => void;
+  isOnline: boolean;
+  isElectron: boolean;
+}
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 

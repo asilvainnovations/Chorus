@@ -1,4 +1,3 @@
-// src/components/Chat/ChatContainer.tsx
 import React, { useRef, useEffect } from 'react';
 import { useChatStore } from '../../store/chatStore';
 import { useChat } from '../../hooks/useChat';
@@ -7,7 +6,7 @@ import { ChatInput } from './ChatInput';
 import { LoadingDots } from '../Common/LoadingDots';
 import { Sparkles, ArrowRight, MessageSquare, Search, Image, Music, FileText, Link2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ChatMode } from '../../types';
+import { ChatMode, Message } from '../../types';
 
 const modeIcons: Record<ChatMode, React.ReactNode> = {
   chat: <MessageSquare size={32} className="text-blue-500" />,
@@ -103,7 +102,7 @@ export const ChatContainer: React.FC = () => {
     <div className="flex-1 flex flex-col min-w-0">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-          {currentConversation.messages.map((message: { id: string; role: string; content: string; timestamp: Date; model?: string; citations?: any[]; images?: any[]; isStreaming?: boolean; searchResults?: any[] }, index: number) => (
+          {currentConversation.messages.map((message: Message, index: number) => (
             <motion.div
               key={message.id}
               initial={{ opacity: 0, y: 10 }}

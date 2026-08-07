@@ -1,5 +1,3 @@
-// src/types/index.ts
-
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -91,10 +89,28 @@ export interface UserSettings {
   soundEnabled: boolean;
 }
 
-// AppContext types
+export interface ChatCompletionRequest {
+  model: string;
+  messages: Array<{ role: string; content: string }>;
+  stream?: boolean;
+  max_tokens?: number;
+  temperature?: number;
+  top_p?: number;
+  presence_penalty?: number;
+  frequency_penalty?: number;
+}
+
 export interface Toast {
   id: string;
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
   duration?: number;
+}
+
+export interface AppContextType {
+  toasts: Toast[];
+  addToast: (toast: Omit<Toast, 'id'>) => void;
+  removeToast: (id: string) => void;
+  isOnline: boolean;
+  isElectron: boolean;
 }

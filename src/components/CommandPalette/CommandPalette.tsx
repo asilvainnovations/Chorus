@@ -1,8 +1,4 @@
 // src/components/CommandPalette/CommandPalette.tsx
-// ============================================
-// ⌘K Command Palette with Keyboard Navigation
-// ============================================
-
 import React from 'react';
 import { Search, Command } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
@@ -73,7 +69,7 @@ export const CommandPalette: React.FC = () => {
                   <div className="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {category}
                   </div>
-                  {commands.map((command, index) => {
+                  {commands.map((command) => {
                     const globalIndex = filteredCommands.indexOf(command);
                     return (
                       <button

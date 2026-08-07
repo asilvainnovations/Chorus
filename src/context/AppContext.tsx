@@ -1,8 +1,4 @@
 // src/context/AppContext.tsx
-// ============================================
-// Global Application Context
-// ============================================
-
 import React, { createContext, useContext, useCallback, useState, ReactNode } from 'react';
 import { Toast, AppContextType } from '../types';
 
@@ -37,7 +33,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     setToasts((prev) => [...prev, newToast]);
 
-    if (newToast.duration > 0) {
+    if ((newToast.duration ?? 0) > 0) {
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, newToast.duration);

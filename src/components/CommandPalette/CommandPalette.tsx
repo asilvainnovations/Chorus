@@ -1,4 +1,8 @@
 // src/components/CommandPalette/CommandPalette.tsx
+// ============================================
+// ⌘K Command Palette with Keyboard Navigation
+// ============================================
+
 import React from 'react';
 import { Search, Command } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
@@ -9,6 +13,7 @@ const iconMap: Record<string, React.ReactNode> = {
   MessageSquarePlus: <Command size={16} />,
   Search: <Search size={16} />,
   Image: <Search size={16} />,
+  MessageSquare: <Command size={16} />,
   Bot: <Command size={16} />,
   Trash2: <Command size={16} />,
   Sun: <Command size={16} />,

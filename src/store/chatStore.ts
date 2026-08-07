@@ -1,7 +1,11 @@
 // src/store/chatStore.ts
+// ============================================
+// Zustand Store with Persistence
+// ============================================
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Conversation, Message, AIModel, ChatMode, UserSettings } from '../types';
+import { Conversation, Message, ChatMode, UserSettings } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface ChatState {
@@ -14,7 +18,7 @@ interface ChatState {
   settings: UserSettings;
   sidebarOpen: boolean;
   commandPaletteOpen: boolean;
-  
+
   // Actions
   createConversation: () => string;
   setCurrentConversation: (id: string) => void;
@@ -83,7 +87,7 @@ export const useChatStore = create<ChatState>()(
                   updatedAt: new Date(),
                   title:
                     conv.messages.length === 0 && message.role === 'user'
-                      ? message.content.slice(0, 50) + '...'
+                      ? message.content.slice(0, 50) + (message.content.length > 50 ? '...' : '')
                       : conv.title,
                 }
               : conv
@@ -135,7 +139,7 @@ export const useChatStore = create<ChatState>()(
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       toggleCommandPalette: () =>
         set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen })),
-      
+
       updateSettings: (newSettings) =>
         set((state) => ({
           settings: { ...state.settings, ...newSettings },
@@ -146,7 +150,7 @@ export const useChatStore = create<ChatState>()(
       },
     }),
     {
-      name: 'meshchat-storage',
+      name: 'huli-ka-storage',
       partialize: (state) => ({
         conversations: state.conversations,
         settings: state.settings,

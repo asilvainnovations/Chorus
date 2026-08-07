@@ -3,6 +3,9 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Conversation, Message, ChatMode, UserSettings } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { AI_MODELS } from '../services/models';
+
+const DEFAULT_MODEL_ID = AI_MODELS[0]?.id ?? 'anthropic/claude-sonnet-latest';
 
 interface ChatState {
   conversations: Conversation[];
@@ -37,14 +40,14 @@ export const useChatStore = create<ChatState>()(
       conversations: [],
       currentConversationId: null,
       currentMode: 'chat',
-      selectedModel: 'openai/gpt-4o',
+      selectedModel: DEFAULT_MODEL_ID,
       isLoading: false,
       isStreaming: false,
       sidebarOpen: true,
       commandPaletteOpen: false,
       settings: {
         theme: 'system',
-        defaultModel: 'openai/gpt-4o',
+        defaultModel: DEFAULT_MODEL_ID,
         apiKey: '',
         streamingEnabled: true,
         soundEnabled: false,
@@ -145,7 +148,7 @@ export const useChatStore = create<ChatState>()(
       },
     }),
     {
-      name: 'huli-ka-storage',
+      name: 'chorus-storage',
       partialize: (state) => ({
         conversations: state.conversations,
         settings: state.settings,

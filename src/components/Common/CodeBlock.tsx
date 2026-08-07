@@ -1,8 +1,4 @@
 // src/components/Common/CodeBlock.tsx
-// ============================================
-// Syntax-Highlighted Code Block
-// ============================================
-
 import React, { useState } from 'react';
 import { Copy, Check, Download } from 'lucide-react';
 

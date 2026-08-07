@@ -1,9 +1,9 @@
 // src/hooks/useChat.ts
 import { useCallback } from 'react';
 import { useChatStore } from '../store/chatStore';
-import { Message, ChatMode } from '../types';
-import { v4 as uuidv4 } from 'date-fns';
-import { streamChatMessage, sendChatMessage, performWebSearch, generateImage } from '../services/api';
+import { Message, ChatMode, SearchResult } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+import { streamChatMessage, sendChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
 
 export const useChat = () => {
@@ -26,6 +26,7 @@ export const useChat = () => {
       if (!content.trim()) return;
 
       const conversationId = currentConversationId || createConversation();
+
       const userMessage: Message = {
         id: uuidv4(),
         role: 'user',
@@ -39,39 +40,48 @@ export const useChat = () => {
       try {
         let assistantContent = '';
         let citations = [];
-        let searchResults = [];
+        let searchResults: SearchResult[] = [];
         let images = [];
 
         // Handle different modes
         if (mode === 'search') {
-          searchResults = await searchWeb(content);
-          assistantContent = `Based on my search, here's what I found about "${content}":\n\n${searchResults
-            .map((r, i) => `[${i + 1}] ${r.title}\n${r.snippet}\nSource: ${r.source}`)
-            .join('\n\n')}`;
+          const searchData = await searchWeb({ query: content, maxResults: 5 });
+          searchResults = searchData.results;
+          assistantContent = searchData.answer
+            ? `${searchData.answer}\n\n**Sources:**\n\n${searchResults
+                .map((r, i) => `[${i + 1}] [${r.title}](${r.url})\n${r.snippet}`)
+                .join('\n\n')}`
+            : `Here are the search results for "${content}":\n\n${searchResults
+                .map((r, i) => `[${i + 1}] **${r.title}**\n${r.snippet}\nSource: ${r.source}`)
+                .join('\n\n')}`;
         } else if (mode === 'image') {
-          const imageUrl = await generateImage(content);
-          images = [{ id: uuidv4(), url: imageUrl, prompt: content, model: selectedModel }];
-          assistantContent = `I've generated an image based on your prompt: "${content}"`;
+          const imageUrls = await generateImage(content, selectedModel);
+          images = imageUrls.map((url, i) => ({
+            id: uuidv4(),
+            url,
+            prompt: content,
+            model: selectedModel,
+          }));
+          assistantContent = `I've generated ${images.length} image${images.length > 1 ? 's' : ''} based on your prompt: "${content}"`;
         } else {
-          // Standard chat with optional RAG
-          const messages = [
-            ...(currentConversation?.messages || []).map((m) => ({
+          // Standard chat with optional RAG augmentation
+          const historyMessages = (currentConversation?.messages || [])
+            .slice(-10)
+            .map((m) => ({
               role: m.role,
               content: m.content,
-            })),
-            { role: 'user', content },
-          ];
+            }));
 
-          // If search mode is enabled, augment with search results
+          // If in chat mode, optionally augment with search
+          let finalContent = content;
           if (mode === 'chat') {
-            const searchData = await searchWeb(content);
-            if (searchData.length > 0) {
-              searchResults = searchData;
-              const context = searchData
+            const searchData = await searchWeb({ query: content, maxResults: 3 });
+            if (searchData.results.length > 0) {
+              searchResults = searchData.results;
+              const context = searchData.results
                 .map((r, i) => `[Source ${i + 1}] ${r.title}: ${r.snippet}`)
                 .join('\n');
-              messages[messages.length - 1].content = 
-                `Context from web search:\n${context}\n\nUser query: ${content}`;
+              finalContent = `Based on the following web search results:\n\n${context}\n\nUser query: ${content}`;
             }
           }
 
@@ -88,12 +98,15 @@ export const useChat = () => {
 
           addMessage(conversationId, assistantMessage);
 
-          // Stream the response
           setStreaming(true);
+
           await streamChatMessage(
             {
               model: selectedModel,
-              messages: messages.slice(-10), // Keep last 10 messages for context
+              messages: [
+                ...historyMessages,
+                { role: 'user', content: finalContent },
+              ],
               temperature: 0.7,
               max_tokens: 4000,
             },
@@ -107,7 +120,6 @@ export const useChat = () => {
               setStreaming(false);
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
-                content: assistantContent,
                 citations: searchResults.map((r, i) => ({
                   id: `cite-${i}`,
                   title: r.title,
@@ -121,15 +133,16 @@ export const useChat = () => {
               setStreaming(false);
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
-                content: `Error: ${error.message}`,
+                content: `**Error:** ${error.message}\n\nPlease check your API key and try again.`,
               });
             }
           );
+
           setLoading(false);
           return;
         }
 
-        // Non-streaming responses
+        // Non-streaming responses (search, image)
         const assistantMessage: Message = {
           id: uuidv4(),
           role: 'assistant',
@@ -153,7 +166,7 @@ export const useChat = () => {
         const errorMessage: Message = {
           id: uuidv4(),
           role: 'assistant',
-          content: 'Sorry, I encountered an error processing your request. Please try again.',
+          content: `**Error:** ${error instanceof Error ? error.message : 'An unexpected error occurred'}\n\nPlease try again or check your connection.`,
           timestamp: new Date(),
           model: selectedModel,
         };
@@ -163,8 +176,24 @@ export const useChat = () => {
         setStreaming(false);
       }
     },
-    [currentConversationId, conversations, selectedModel, currentMode, createConversation, addMessage, updateMessage, setLoading, setStreaming]
+    [
+      currentConversationId,
+      conversations,
+      selectedModel,
+      currentMode,
+      createConversation,
+      addMessage,
+      updateMessage,
+      setLoading,
+      setStreaming,
+    ]
   );
 
-  return { sendMessage, currentConversation };
+  const abortStream = useCallback(() => {
+    abortCurrentStream();
+    setStreaming(false);
+    setLoading(false);
+  }, [setStreaming, setLoading]);
+
+  return { sendMessage, abortStream, currentConversation };
 };

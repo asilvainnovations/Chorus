@@ -1,6 +1,10 @@
 // src/components/Common/CodeBlock.tsx
+// ============================================
+// Syntax-Highlighted Code Block
+// ============================================
+
 import React, { useState } from 'react';
-import { Copy, Check, Play, Download } from 'lucide-react';
+import { Copy, Check, Download } from 'lucide-react';
 
 interface CodeBlockProps {
   language: string;
@@ -42,22 +46,18 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ language, value }) => {
   return (
     <div className="my-4 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shadow-sm">
       <div className="flex items-center justify-between px-4 py-2.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <span className="text-xs font-mono font-semibold text-gray-500 dark:text-gray-400 uppercase">{language}</span>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            {language || 'text'}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
           <button
             onClick={handleCopy}
-            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
             title="Copy code"
           >
             {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} className="text-gray-500" />}
           </button>
           <button
             onClick={handleDownload}
-            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
             title="Download code"
           >
             <Download size={14} className="text-gray-500" />

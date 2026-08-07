@@ -1,4 +1,8 @@
 // src/components/Common/MarkdownRenderer.tsx
+// ============================================
+// Markdown Renderer with Syntax Highlighting
+// ============================================
+
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';

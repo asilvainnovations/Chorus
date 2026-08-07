@@ -1,4 +1,8 @@
 // src/components/Common/LoadingDots.tsx
+// ============================================
+// Animated Loading Indicator
+// ============================================
+
 import React from 'react';
 
 export const LoadingDots: React.FC = () => {

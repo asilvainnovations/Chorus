@@ -1,4 +1,8 @@
 // src/components/Common/Toaster.tsx
+// ============================================
+// Toast Notification System
+// ============================================
+
 import React from 'react';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { useAppContext } from '../../context/AppContext';

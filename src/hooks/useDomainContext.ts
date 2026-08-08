@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { getDomainById, getAllDomains } from '../services/domains';
+import { Domain } from '../types';
 
 /**
  * Hook to access domain context for the current conversation
@@ -19,8 +20,8 @@ export const useDomainContext = () => {
   const relatedDomains = useMemo(() => {
     if (!activeDomain) return [];
     return activeDomain.relatedDomainIds
-      .map((id) => getDomainById(id))
-      .filter((d) => d !== undefined);
+      .map((id: string) => getDomainById(id))
+      .filter((d): d is Domain => d !== undefined);
   }, [activeDomain]);
 
   const allDomains = useMemo(() => getAllDomains(), []);

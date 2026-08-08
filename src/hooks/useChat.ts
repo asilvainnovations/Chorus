@@ -5,6 +5,61 @@ import { Message, ChatMode, SearchResult, GeneratedImage } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { streamChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
+import { getDomainById, getDomainConnections } from '../services/domains';
+
+// ---------------------------------------------------------------------------
+// Chorus AI — Domain System Prompt (Foundational)
+// Injected as the first message in every chat request. If a conversation has
+// an active domain, the domain's systemPromptAddendum is appended.
+// ---------------------------------------------------------------------------
+const CHORUS_SYSTEM_PROMPT = `You are Chorus, a strategic foresight AI assistant specialising in global challenges and their solutions.
+
+Your core domains are:
+1. Sustainable Development — SDG alignment, just transitions, development + environment integration
+2. Green Economy — decoupling growth from resource depletion, renewable economics, green jobs
+3. Circular Economy — designing out waste, product-as-service, material stewardship
+4. Resilience — anticipation, absorption, adaptation, transformation capacities; bounce-forward thinking
+5. Disaster Risk Reduction — UNDRR Sendai Framework, hazard assessment, community preparedness
+6. Systems Thinking — causal loops, leverage points, emergence, complexity
+7. Inclusivity & Social Equity — leave no one behind, gender equality, disability inclusion, indigenous rights
+8. Well-Being — physical, mental, social, spiritual health; MHPSS; salutogenesis
+9. Real-Time Leadership — adaptive, foresight-informed, participatory decision-making
+10. Innovation — climate tech, social innovation, policy innovation, technology for good
+
+When answering:
+- Ground responses in evidence, frameworks (SDGs, Sendai, etc.), and real-world examples
+- Be practical and action-oriented
+- Surface interconnections across domains
+- Cite sources when available
+- If a question touches multiple domains, explain the connections
+- If outside these domains, answer helpfully but note Chorus's specialization
+
+Tone: expert but accessible, solution-focused, inclusive, systems-aware.`;
+
+// Helper function to build domain-aware system prompt
+const buildDomainAwarePrompt = (activeDomainId?: string): string => {
+  if (!activeDomainId) return CHORUS_SYSTEM_PROMPT;
+  
+  const domain = getDomainById(activeDomainId);
+  if (!domain) return CHORUS_SYSTEM_PROMPT;
+  
+  const connections = getDomainConnections(activeDomainId);
+  const relatedNames = connections
+    .filter((c) => c.directConnection)
+    .map((c) => c.domain.name)
+    .join(', ');
+  
+  return `${CHORUS_SYSTEM_PROMPT}
+
+FOCUS DOMAIN: ${domain.name}
+${domain.description}
+
+Key frameworks for this domain: ${domain.frameworks.join(', ')}
+
+${domain.systemPromptAddendum}
+
+INTERCONNECTIONS: This domain is directly linked to ${relatedNames}. Draw on these connections to provide systemic insights.`;
+};
 
 export const useChat = () => {
   const {
@@ -98,7 +153,11 @@ export const useChat = () => {
           await streamChatMessage(
             {
               model: selectedModel,
-              messages: [...historyMessages, { role: 'user', content: finalContent }],
+              messages: [
+                { role: 'system', content: buildDomainAwarePrompt(currentConversation?.activeDomain) },
+                ...historyMessages,
+                { role: 'user', content: finalContent },
+              ],
               temperature: 0.7,
               max_tokens: 4000,
             },

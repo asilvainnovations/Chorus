@@ -27,8 +27,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/asilvainnovations/chorus.git
-cd chorus
+git clone https://github.com/asilvainnovations/Chorus.git
+cd Chorus
 
 # 2. Install dependencies
 npm install
@@ -120,3 +120,7 @@ Output is in `dist/`. Deploy to Vercel, Netlify, or any static host.
 - **Animation**: Framer Motion
 - **Markdown**: react-markdown + remark-gfm + rehype-highlight
 - **Icons**: Lucide React
+
+## License
+
+Apache License 2.0 © 2026 ASilva Innovations. See [LICENSE](./LICENSE) for full terms.

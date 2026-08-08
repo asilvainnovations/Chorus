@@ -18,7 +18,7 @@ interface ChatState {
   sidebarOpen: boolean;
   commandPaletteOpen: boolean;
 
-  createConversation: () => string;
+  createConversation: (domainId?: string) => string;
   setCurrentConversation: (id: string) => void;
   addMessage: (conversationId: string, message: Message) => void;
   updateMessage: (conversationId: string, messageId: string, updates: Partial<Message>) => void;
@@ -32,6 +32,7 @@ interface ChatState {
   toggleCommandPalette: () => void;
   updateSettings: (settings: Partial<UserSettings>) => void;
   clearAllConversations: () => void;
+  setActiveDomain: (conversationId: string, domainId: string) => void;
 }
 
 export const useChatStore = create<ChatState>()(
@@ -53,7 +54,7 @@ export const useChatStore = create<ChatState>()(
         soundEnabled: false,
       },
 
-      createConversation: () => {
+      createConversation: (domainId?: string) => {
         const id = uuidv4();
         const newConversation: Conversation = {
           id,
@@ -63,6 +64,7 @@ export const useChatStore = create<ChatState>()(
           updatedAt: new Date(),
           model: get().selectedModel,
           mode: get().currentMode,
+          activeDomain: domainId,
         };
         set((state) => ({
           conversations: [newConversation, ...state.conversations],
@@ -145,6 +147,16 @@ export const useChatStore = create<ChatState>()(
 
       clearAllConversations: () => {
         set({ conversations: [], currentConversationId: null });
+      },
+
+      setActiveDomain: (conversationId, domainId) => {
+        set((state) => ({
+          conversations: state.conversations.map((conv) =>
+            conv.id === conversationId
+              ? { ...conv, activeDomain: domainId }
+              : conv
+          ),
+        }));
       },
     }),
     {

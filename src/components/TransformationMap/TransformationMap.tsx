@@ -27,7 +27,9 @@ export const TransformationMap: React.FC<TransformationMapProps> = ({ onDomainSe
 
   const edges = useMemo(() => {
     const edgeList: Array<{ from: string; to: string; fromX: number; fromY: number; toX: number; toY: number }> = [];
-    const positionMap = new Map(nodePositions.map((p) => [p.domain.id, { x: p.x, y: p.y }]));
+    const positionMap = new Map<string, { x: number; y: number }>(
+      nodePositions.map((p) => [p.domain.id, { x: p.x, y: p.y }])
+    );
 
     nodePositions.forEach((node) => {
       node.domain.relatedDomainIds.forEach((relatedId) => {
@@ -96,7 +98,7 @@ export const TransformationMap: React.FC<TransformationMapProps> = ({ onDomainSe
         ))}
 
         {/* Nodes (domains) */}
-        {nodePositions.map((node, index) => (
+        {nodePositions.map((node: typeof nodePositions[0], index: number) => (
           <motion.g
             key={node.domain.id}
             initial={{ opacity: 0, scale: 0 }}
@@ -149,7 +151,7 @@ export const TransformationMap: React.FC<TransformationMapProps> = ({ onDomainSe
 
       {/* Legend */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 w-full max-w-2xl mt-4">
-        {domains.map((domain) => (
+        {domains.map((domain: typeof domains[0]) => (
           <button
             key={domain.id}
             onClick={() => handleDomainClick(domain.id)}

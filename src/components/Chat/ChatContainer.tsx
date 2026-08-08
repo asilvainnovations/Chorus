@@ -3,6 +3,7 @@ import { useChatStore } from '../../store/chatStore';
 import { useChat } from '../../hooks/useChat';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
+import { TransformationMap } from '../TransformationMap/TransformationMap';
 import { LoadingDots } from '../Common/LoadingDots';
 import { Sparkles, ArrowRight, MessageSquare, Search, Image, Music, FileText, Link2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -60,38 +61,54 @@ export const ChatContainer: React.FC = () => {
   if (!currentConversation || currentConversation.messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col">
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center max-w-lg"
-          >
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              {modeIcons[currentMode] || <Sparkles size={40} className="text-blue-600 dark:text-blue-400" />}
-            </div>
-            <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
-              What can I help you with?
-            </h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">
-              Ask me anything, search the web, generate images, or analyze documents.
-            </p>
+        <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-y-auto">
+          {currentMode === 'chat' ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full max-w-3xl"
+            >
+              <TransformationMap
+                onDomainSelect={(domainId) => {
+                  if (currentConversationId) {
+                    useChatStore.getState().setActiveDomain(currentConversationId, domainId);
+                  }
+                }}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-lg"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                {modeIcons[currentMode] || <Sparkles size={40} className="text-blue-600 dark:text-blue-400" />}
+              </div>
+              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
+                What can I help you with?
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">
+                Ask me anything, search the web, generate images, or analyze documents.
+              </p>
 
-            <div className="grid gap-2 text-left">
-              {suggestions[currentMode].map((suggestion, i) => (
-                <motion.button
-                  key={suggestion}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  onClick={() => sendMessage(suggestion, currentMode)}
-                  className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all group text-left"
-                >
-                  <ArrowRight size={16} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{suggestion}</span>
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+              <div className="grid gap-2 text-left">
+                {suggestions[currentMode].map((suggestion, i) => (
+                  <motion.button
+                    key={suggestion}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    onClick={() => sendMessage(suggestion, currentMode)}
+                    className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all group text-left"
+                  >
+                    <ArrowRight size={16} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{suggestion}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
         </div>
         <ChatInput />
       </div>

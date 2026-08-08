@@ -20,7 +20,7 @@
     "highlight.js": "^11.9.0",
     "lucide-react": "^0.400.0",
     "framer-motion": "^11.0.0",
-    "uuid": "^14.0.0",
+    "uuid": "^11.0.0",
     "date-fns": "^3.6.0"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 // src/hooks/useChat.ts
 import { useCallback } from 'react';
 import { useChatStore } from '../store/chatStore';
-import { Message, ChatMode, SearchResult, GeneratedImage } from '../types';
+import { Message, ChatMode, SearchResult, GeneratedImage, Conversation } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { streamChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
@@ -74,7 +74,7 @@ export const useChat = () => {
     createConversation,
   } = useChatStore();
 
-  const currentConversation = conversations.find((c) => c.id === currentConversationId);
+  const currentConversation = conversations.find((c: Conversation) => c.id === currentConversationId);
 
   const sendMessage = useCallback(
     async (content: string, mode: ChatMode = currentMode) => {

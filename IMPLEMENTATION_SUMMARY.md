@@ -78,7 +78,7 @@ Chorus transformed from a general-purpose AI chat app into a **domain-scoped str
 - **`useChat.ts`** — Updated system prompt (covers all 10 domains), added `buildDomainAwarePrompt()` helper
 - **`ChatContainer.tsx`** — Shows `TransformationMap` in empty state for chat mode; handles domain selection
 
-### Brand Rename (Huli Ka → Chorus)
+### Brand Rename (Chorus)
 - Header, chat placeholder, disclaimers, settings footer, OpenRouter header, meta tags, package name, README, LICENSE
 
 ---

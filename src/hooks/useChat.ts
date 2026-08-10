@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { streamChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
 import { getDomainById, getDomainConnections } from '../types/domain';
+import posthog from '@/posthog';
 
 // ---------------------------------------------------------------------------
 // Chorus AI — Domain System Prompt (Foundational)
@@ -90,6 +91,11 @@ export const useChat = () => {
       };
 
       addMessage(conversationId, userMessage);
+      posthog.capture('message_sent', {
+        mode,
+        model_id: selectedModel,
+        has_active_domain: Boolean(currentConversation?.activeDomain),
+      });
       setLoading(true);
 
       try {
@@ -169,6 +175,10 @@ export const useChat = () => {
             },
             () => {
               setStreaming(false);
+              posthog.capture('response_completed', {
+                mode,
+                model_id: selectedModel,
+              });
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
                 citations: searchResults.map((r, idx) => ({
@@ -182,6 +192,10 @@ export const useChat = () => {
             },
             (error) => {
               setStreaming(false);
+              posthog.capture('response_failed', {
+                mode,
+                model_id: selectedModel,
+              });
               updateMessage(conversationId, assistantMessageId, {
                 isStreaming: false,
                 content: `**Error:** ${error.message}\n\nPlease check your API key and try again.`,
@@ -211,8 +225,16 @@ export const useChat = () => {
         };
 
         addMessage(conversationId, assistantMessage);
+        posthog.capture('response_completed', {
+          mode,
+          model_id: selectedModel,
+        });
       } catch (error) {
         console.error('Chat error:', error);
+        posthog.capture('response_failed', {
+          mode,
+          model_id: selectedModel,
+        });
         const errorMessage: Message = {
           id: uuidv4(),
           role: 'assistant',
@@ -240,7 +262,9 @@ export const useChat = () => {
   );
 
   const abortStream = useCallback(() => {
-    abortCurrentStream();
+    if (!abortCurrentStream()) return;
+
+    posthog.capture('response_stopped');
     setStreaming(false);
     setLoading(false);
   }, [setStreaming, setLoading]);

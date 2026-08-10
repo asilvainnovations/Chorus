@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { getAllDomains, getDomainById } from '../../types/domain';
-import { useChatStore } from '../../store/chatStore';
+import { getAllDomains } from '../../types/domain';
 import { motion } from 'framer-motion';
+import posthog from '@/posthog';
 
 interface TransformationMapProps {
   onDomainSelect: (domainId: string) => void;
@@ -55,6 +55,7 @@ export const TransformationMap: React.FC<TransformationMapProps> = ({ onDomainSe
 
   const handleDomainClick = (domainId: string) => {
     onDomainSelect(domainId);
+    posthog.capture('domain_selected', { domain_id: domainId });
   };
 
   return (

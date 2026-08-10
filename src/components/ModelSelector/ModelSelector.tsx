@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Sparkles, Zap } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
 import { AI_MODELS, getBasicModels, getPremiumModels } from '../../services/models';
+import posthog from '@/posthog';
 
 export const ModelSelector: React.FC = () => {
   const { selectedModel, setModel } = useChatStore();
@@ -43,6 +44,10 @@ export const ModelSelector: React.FC = () => {
                 key={model.id}
                 onClick={() => {
                   setModel(model.id);
+                  posthog.capture('model_selected', {
+                    model_id: model.id,
+                    model_category: model.category,
+                  });
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
@@ -67,6 +72,10 @@ export const ModelSelector: React.FC = () => {
                 key={model.id}
                 onClick={() => {
                   setModel(model.id);
+                  posthog.capture('model_selected', {
+                    model_id: model.id,
+                    model_category: model.category,
+                  });
                   setIsOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${

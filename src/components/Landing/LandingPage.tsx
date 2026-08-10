@@ -18,7 +18,7 @@ export const LandingPage: React.FC = () => {
       localStorage.setItem(KEY, theme);
       const btn = root.querySelector('#themeToggle') as HTMLButtonElement | null;
       if (btn) {
-        btn.setAttribute('aria-pressed', theme === 'light');
+        btn.setAttribute('aria-pressed', String(theme === 'light'));
         btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
       }
     };
@@ -98,7 +98,7 @@ export const LandingPage: React.FC = () => {
     window.addEventListener('scroll', scrollHandler, { passive: true });
     btt?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-    const ctaButtons = root.querySelectorAll('a[href="https://chorus-ai.asilvainnoovations.com"], a[href="https://app.chorus.ai"]');
+    const ctaButtons = root.querySelectorAll('a[href="https://chorus-ai.asilvainnovations.com"], a[href="https://app.chorus.ai"]');
     const ctaHandler = (e: Event) => {
       e.preventDefault();
       navigate('/chat');
@@ -367,7 +367,7 @@ export const LandingPage: React.FC = () => {
                 <h1>Every AI model, <span className="grad-text">one conversation.</span></h1>
                 <p className="hero-sub">Chorus brings OpenAI, Anthropic, Google, xAI, DeepSeek, and Mistral into a single thread — with grounded web search, image generation, and original music, all in one place.</p>
                 <div className="cta-row">
-                  <a href="https://chorus-ai.asilvainnoovations.com" className="btn btn-primary"><span>Start Chatting Free</span><svg><use href="#i-arrow"/></svg></a>
+                  <a href="https://chorus-ai.asilvainnovations.com" className="btn btn-primary"><span>Start Chatting Free</span><svg><use href="#i-arrow"/></svg></a>
                   <a href="#how" className="btn btn-gold"><span>See How It Works</span></a>
                 </div>
                 <p className="hero-note">No account required to try it. Bring your own API key, stay in control of your data.</p>
@@ -563,7 +563,7 @@ export const LandingPage: React.FC = () => {
               <h2>Stop juggling <span className="grad-text">five different tabs</span>.</h2>
               <p>Six model providers, grounded search, image and music generation — one conversation, your key, your data.</p>
               <div className="cta-row">
-                <a href="https://chorus-ai.asilvainnoovations.com" className="btn btn-primary"><span>Start Chatting Free</span><svg><use href="#i-arrow"/></svg></a>
+                <a href="https://chorus-ai.asilvainnovations.com" className="btn btn-primary"><span>Start Chatting Free</span><svg><use href="#i-arrow"/></svg></a>
                 <a href="#features" className="btn btn-ghost"><span>Explore Features</span></a>
               </div>
             </div>
@@ -590,7 +590,7 @@ export const LandingPage: React.FC = () => {
               <h4>Resources</h4>
               <ul>
                 <li><a href="#faq">FAQ</a></li>
-                <li><a href="https://chorus-ai.asilvainnoovations.com">Get Started</a></li>
+                <li><a href="https://chorus-ai.asilvainnovations.com">Get Started</a></li>
               </ul>
             </div>
             <div className="footer-col">

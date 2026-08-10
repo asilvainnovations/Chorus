@@ -3,6 +3,7 @@ import React from 'react';
 import { MessageSquare, Trash2, Edit3, X } from 'lucide-react';
 import { useChatStore } from '../../store/chatStore';
 import { formatDistanceToNow } from 'date-fns';
+import posthog from '@/posthog';
 
 export const ConversationSidebar: React.FC = () => {
   const { conversations, currentConversationId, setCurrentConversation, deleteConversation, renameConversation, createConversation } = useChatStore();
@@ -26,7 +27,10 @@ export const ConversationSidebar: React.FC = () => {
     <div className="h-full w-80 bg-gray-50 dark:bg-gray-950 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       <div className="p-3">
         <button
-          onClick={() => createConversation()}
+          onClick={() => {
+            createConversation();
+            posthog.capture('conversation_created');
+          }}
           className="w-full flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
         >
           <MessageSquare size={18} />

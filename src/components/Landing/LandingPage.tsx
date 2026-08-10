@@ -1,6 +1,7 @@
 // src/components/Landing/LandingPage.tsx
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import posthog from '@/posthog';
 
 export const LandingPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,7 +19,7 @@ export const LandingPage: React.FC = () => {
       localStorage.setItem(KEY, theme);
       const btn = root.querySelector('#themeToggle') as HTMLButtonElement | null;
       if (btn) {
-        btn.setAttribute('aria-pressed', theme === 'light');
+        btn.setAttribute('aria-pressed', String(theme === 'light'));
         btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
       }
     };
@@ -101,6 +102,7 @@ export const LandingPage: React.FC = () => {
     const ctaButtons = root.querySelectorAll('a[href="https://chorus-ai.asilvainnoovations.com"], a[href="https://app.chorus.ai"]');
     const ctaHandler = (e: Event) => {
       e.preventDefault();
+      posthog.capture('landing_cta_clicked');
       navigate('/chat');
     };
     ctaButtons.forEach((btn) => btn.addEventListener('click', ctaHandler));

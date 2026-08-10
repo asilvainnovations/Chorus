@@ -104,11 +104,12 @@ export const streamChatMessage = async (
   }
 };
 
-export const abortCurrentStream = (): void => {
-  if (currentAbortController) {
-    currentAbortController.abort();
-    currentAbortController = null;
-  }
+export const abortCurrentStream = (): boolean => {
+  if (!currentAbortController) return false;
+
+  currentAbortController.abort();
+  currentAbortController = null;
+  return true;
 };
 
 export const generateImage = async (

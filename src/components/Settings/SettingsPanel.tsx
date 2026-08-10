@@ -5,6 +5,7 @@ import { useChatStore } from '../../store/chatStore';
 import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPremiumModels, getBasicModels } from '../../services/models';
+import posthog from '@/posthog';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -156,6 +157,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose })
                   onClick={() => {
                     if (confirm('Clear all conversations? This cannot be undone.')) {
                       useChatStore.getState().clearAllConversations();
+                      posthog.capture('conversations_cleared');
                     }
                   }}
                   className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl transition-colors"

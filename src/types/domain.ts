@@ -1,4 +1,4 @@
-import { Domain } from '../types';
+import { Domain } from './types';
 
 /**
  * Chorus Strategic Foresight Explorer — Domain Taxonomy
@@ -292,7 +292,6 @@ export const getDomainConnections = (domainId: string): { domain: Domain; direct
     .map((id) => ({ domain: getDomainById(id)!, directConnection: true }))
     .filter((item) => item.domain);
 
-  // Second-order connections (optional, not shown in v1 but useful for analytics)
   const secondOrder = new Set<string>();
   domain.relatedDomainIds.forEach((relatedId) => {
     const related = getDomainById(relatedId);

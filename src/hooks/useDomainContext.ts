@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useChatStore } from '../store/chatStore';
-import { getDomainById, getAllDomains } from '../services/domains';
+import { getDomainById, getAllDomains } from '../types/domain';
 import { Domain } from '../types';
 
 /**

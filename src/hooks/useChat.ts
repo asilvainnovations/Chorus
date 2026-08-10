@@ -5,7 +5,7 @@ import { Message, ChatMode, SearchResult, GeneratedImage, Conversation } from '.
 import { v4 as uuidv4 } from 'uuid';
 import { streamChatMessage, abortCurrentStream, generateImage } from '../services/api';
 import { searchWeb } from '../services/search';
-import { getDomainById, getDomainConnections } from '../services/domains';
+import { getDomainById, getDomainConnections } from '../hooks/useDomainContext';
 
 // ---------------------------------------------------------------------------
 // Chorus AI — Domain System Prompt (Foundational)

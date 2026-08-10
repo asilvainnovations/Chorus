@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { getAllDomains, getDomainById } from '../../services/domains';
+import { getAllDomains, getDomainById } from '../../types/domain';
 import { useChatStore } from '../../store/chatStore';
 import { motion } from 'framer-motion';
 

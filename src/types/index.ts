@@ -40,6 +40,8 @@ export interface Conversation {
   updatedAt: Date;
   model: string;
   mode: ChatMode;
+  activeDomain?: string;
+  relatedDomains?: string[];
 }
 
 export type ChatMode = 'chat' | 'search' | 'image' | 'music' | 'pdf' | 'url';
@@ -114,3 +116,26 @@ export interface AppContextType {
   isOnline: boolean;
   isElectron: boolean;
 }
+
+export interface Resource {
+  title: string;
+  url: string;
+  type: 'framework' | 'case-study' | 'research' | 'tool' | 'initiative';
+  description: string;
+}
+
+export interface Domain {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  backgroundColor: string;
+  relatedDomainIds: string[];
+  frameworks: string[];
+  resources: Resource[];
+  systemPromptAddendum: string;
+  suggestedQueries: string[];
+}
+
+export { DOMAINS, getAllDomains, getDomainById, getDomainConnections } from './domain';
